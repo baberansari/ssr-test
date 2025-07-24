@@ -34,6 +34,7 @@
 </template>
 
 <script setup>
+import axios from 'axios'
 import { useHead } from '@vueuse/head'
 import { ref, inject, onMounted } from 'vue'
 
@@ -47,19 +48,17 @@ if (ssrData.aboutItems) {
   loading.value = true
   onMounted(async () => {
     try {
-      const [postsRes, userRes] = await Promise.all([
-        fetch('https://jsonplaceholder.typicode.com/posts?_limit=2'),
-        fetch('https://randomuser.me/api/?results=2')
+      const [postsRes, usersRes] = await Promise.all([
+        axios.get('https://jsonplaceholder.typicode.com/posts?_limit=2'),
+        axios.get('https://randomuser.me/api/?results=2')
       ])
-      const posts = await postsRes.json()
-      const users = await userRes.json()
 
-      aboutItems.value = posts.map((post, i) => ({
+      aboutItems.value = postsRes.data.map((post, i) => ({
         ...post,
-        image: users.results[i]?.picture?.large || 'https://via.placeholder.com/150'
+        image: usersRes.data.results[i]?.picture?.large || 'https://via.placeholder.com/150'
       }))
     } catch (err) {
-      console.error('Fetch error:', err)
+      console.error('Axios fetch error:', err)
     } finally {
       loading.value = false
     }
@@ -76,24 +75,25 @@ useHead({
 </script>
 
 <script>
+import axios from 'axios'
+
 export default {
   async load() {
-    const [postsRes, userRes] = await Promise.all([
-      fetch('https://jsonplaceholder.typicode.com/posts?_limit=2'),
-      fetch('https://randomuser.me/api/?results=2')
+    const [postsRes, usersRes] = await Promise.all([
+      axios.get('https://jsonplaceholder.typicode.com/posts?_limit=2'),
+      axios.get('https://randomuser.me/api/?results=2')
     ])
-    const posts = await postsRes.json()
-    const users = await userRes.json()
 
-    const aboutItems = posts.map((post, i) => ({
+    const aboutItems = postsRes.data.map((post, i) => ({
       ...post,
-      image: users.results[i]?.picture?.large || 'https://via.placeholder.com/150'
+      image: usersRes.data.results[i]?.picture?.large || 'https://via.placeholder.com/150'
     }))
 
     return { aboutItems }
   }
 }
 </script>
+
 
 <style scoped>
 .about {

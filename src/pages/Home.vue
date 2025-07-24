@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+import axios from 'axios'
 import { useHead } from '@vueuse/head'
 import { ref, inject, onMounted } from 'vue'
 
@@ -50,25 +51,19 @@ if (!ssrData.posts || !ssrData.users) {
   onMounted(async () => {
     try {
       const [postsRes, usersRes, imagesRes] = await Promise.all([
-        fetch("https://jsonplaceholder.typicode.com/posts?_limit=5"),
-        fetch("https://jsonplaceholder.typicode.com/users?_limit=3"),
-        fetch("https://randomuser.me/api/?results=3")
+        axios.get("https://jsonplaceholder.typicode.com/posts?_limit=5"),
+        axios.get("https://jsonplaceholder.typicode.com/users?_limit=3"),
+        axios.get("https://randomuser.me/api/?results=3")
       ])
 
-      const [postsData, usersData, imagesData] = await Promise.all([
-        postsRes.json(),
-        usersRes.json(),
-        imagesRes.json()
-      ])
-
-      users.value = usersData.map((user, i) => ({
+      users.value = usersRes.data.map((user, i) => ({
         ...user,
-        image: imagesData.results[i]?.picture?.medium || 'https://via.placeholder.com/100'
+        image: imagesRes.data.results[i]?.picture?.medium || 'https://via.placeholder.com/100'
       }))
 
-      posts.value = postsData
+      posts.value = postsRes.data
     } catch (err) {
-      console.error("❌ Fetch error", err)
+      console.error("❌ Axios error", err)
     } finally {
       loading.value = false
     }
@@ -85,29 +80,29 @@ useHead({
 </script>
 
 <script>
+import axios from 'axios'
+
 export default {
   async load() {
     const [postsRes, usersRes, imagesRes] = await Promise.all([
-      fetch("https://jsonplaceholder.typicode.com/posts?_limit=5"),
-      fetch("https://jsonplaceholder.typicode.com/users?_limit=3"),
-      fetch("https://randomuser.me/api/?results=3")
+      axios.get("https://jsonplaceholder.typicode.com/posts?_limit=5"),
+      axios.get("https://jsonplaceholder.typicode.com/users?_limit=3"),
+      axios.get("https://randomuser.me/api/?results=3")
     ])
 
-    const [posts, usersData, imagesData] = await Promise.all([
-      postsRes.json(),
-      usersRes.json(),
-      imagesRes.json()
-    ])
-
-    const users = usersData.map((user, i) => ({
+    const users = usersRes.data.map((user, i) => ({
       ...user,
-      image: imagesData.results[i]?.picture?.medium || 'https://via.placeholder.com/100'
+      image: imagesRes.data.results[i]?.picture?.medium || 'https://via.placeholder.com/100'
     }))
 
-    return { posts, users }
+    return {
+      posts: postsRes.data,
+      users
+    }
   }
 }
 </script>
+
 
 <style scoped>
 .page-container {
