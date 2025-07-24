@@ -36,12 +36,18 @@ async function createServer() {
       const { render } = await vite.ssrLoadModule("/src/entry-server.js");
 
       // Call the render function to get app HTML and head tags
-      const { appHtml, headTags } = await render(url);
+      const { appHtml, headTags, ssrData } = await render(url);
 
       // Inject head tags before </head> and app HTML into the template
       const htmlWithHead = template
         .replace("<!--HEAD_TAGS-->", headTags || "")
-        .replace("<!--app-->", appHtml);
+        .replace(
+          "<!--app-->",
+          appHtml +
+            `\n<script>window.__SSR_DATA__ = ${JSON.stringify(
+              ssrData
+            )}</script>`
+        );
 
       res.status(200).set({ "Content-Type": "text/html" }).end(htmlWithHead);
     } catch (e) {

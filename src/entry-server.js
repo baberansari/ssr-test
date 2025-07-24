@@ -8,13 +8,22 @@ export async function render(url) {
   await router.push(url)
   await router.isReady()
 
-  const appHtml = await renderToString(app)
+ const matched = router.currentRoute.value.matched
+let ssrData = {}
 
-  // ✅ Properly render the <head> content for SSR
+for (const route of matched) {
+  const component = route.components?.default
+  if (typeof component?.load === 'function') {
+    const data = await component.load()
+    ssrData = { ...ssrData, ...data }
+  }
+}
+
+ app.provide('ssr-data', ssrData)
+
+
+  const appHtml = await renderToString(app)
   const { headTags } = await renderHeadToString(head)
 
-  return {
-    appHtml,
-    headTags,
-  }
+  return { appHtml, headTags, ssrData }
 }
