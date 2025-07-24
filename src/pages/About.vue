@@ -79,9 +79,13 @@ import axios from 'axios'
 
 export default {
   async load() {
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+    }
+
     const [postsRes, usersRes] = await Promise.all([
-      axios.get('https://jsonplaceholder.typicode.com/posts?_limit=2'),
-      axios.get('https://randomuser.me/api/?results=2')
+      axios.get('https://jsonplaceholder.typicode.com/posts?_limit=2', { headers }),
+      axios.get('https://randomuser.me/api/?results=2', { headers })
     ])
 
     const aboutItems = postsRes.data.map((post, i) => ({
@@ -92,6 +96,7 @@ export default {
     return { aboutItems }
   }
 }
+
 </script>
 
 

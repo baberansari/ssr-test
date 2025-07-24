@@ -82,12 +82,17 @@ useHead({
 <script>
 import axios from 'axios'
 
+
 export default {
   async load() {
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+    }
+
     const [postsRes, usersRes, imagesRes] = await Promise.all([
-      axios.get("https://jsonplaceholder.typicode.com/posts?_limit=5"),
-      axios.get("https://jsonplaceholder.typicode.com/users?_limit=3"),
-      axios.get("https://randomuser.me/api/?results=3")
+      axios.get("https://jsonplaceholder.typicode.com/posts?_limit=5", { headers }),
+      axios.get("https://jsonplaceholder.typicode.com/users?_limit=3", { headers }),
+      axios.get("https://randomuser.me/api/?results=3", { headers })
     ])
 
     const users = usersRes.data.map((user, i) => ({
@@ -101,6 +106,7 @@ export default {
     }
   }
 }
+
 </script>
 
 
