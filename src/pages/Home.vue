@@ -2,28 +2,21 @@
   <div class="page-container">
     <div v-if="loading" class="card">
       <h3>Loading...</h3>
-      <p>Please wait while we fetch data.</p>
+      <p>Please wait while we fetch player data.</p>
     </div>
 
     <template v-else>
       <section>
-        <h2>Latest Posts</h2>
+        <h2>Player List</h2>
         <div class="cards">
-          <div v-for="post in posts" :key="post.id" class="card">
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.body }}</p>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h2>Users</h2>
-        <div class="cards">
-          <div v-for="user in users" :key="user.id" class="card">
-            <img :src="user.image" alt="User Image" class="user-img" />
+          <div v-for="player in players" :key="player.id" class="card">
+            <img :src="playerImageUrl(player.image)" alt="Player Image" class="user-img" />
             <div>
-              <h3>{{ user.name }}</h3>
-              <p>{{ user.email }}</p>
+              <h3>{{ player.name }}</h3>
+              <p>Number: {{ player.number }}</p>
+              <p>Position: {{ player.position }}</p>
+              <p>Height: {{ player.height }} | Weight: {{ player.weight }}</p>
+              <p>DOB: {{ player.dob }}</p>
             </div>
           </div>
         </div>
@@ -34,47 +27,42 @@
 
 <script setup>
 import axios from 'axios'
-import { useHead } from '@vueuse/head'
 import { ref, inject, onMounted } from 'vue'
+import { useHead } from '@vueuse/head'
 
-const posts = ref([])
-const users = ref([])
+const players = ref([])
 const loading = ref(false)
-
 const ssrData = inject('ssr-data', {})
 
-if (ssrData.posts) posts.value = ssrData.posts
-if (ssrData.users) users.value = ssrData.users
-
-if (!ssrData.posts || !ssrData.users) {
+if (ssrData.players) {
+  players.value = ssrData.players
+} else {
   loading.value = true
   onMounted(async () => {
     try {
-      const [postsRes, usersRes, imagesRes] = await Promise.all([
-        axios.get("https://jsonplaceholder.typicode.com/posts?_limit=5"),
-        axios.get("https://jsonplaceholder.typicode.com/users?_limit=3"),
-        axios.get("https://randomuser.me/api/?results=3")
-      ])
-
-      users.value = usersRes.data.map((user, i) => ({
-        ...user,
-        image: imagesRes.data.results[i]?.picture?.medium || 'https://via.placeholder.com/100'
-      }))
-
-      posts.value = postsRes.data
+      const response = await axios.get('http://assistant-caochs.test/api/player-list', {
+        headers: {
+          Authorization: 'Bearer 1|RnRN5pzxzeGiGSDCk6s36QCxo98gadELLqEoHbDa07cee14e'
+        }
+      })
+      players.value = response.data.data
     } catch (err) {
-      console.error("❌ Axios error", err)
+      console.error('Failed to load player list', err)
     } finally {
       loading.value = false
     }
   })
 }
 
+const playerImageUrl = (path) => {
+  return path ? `http://assistant-caochs.test/${path}` : ''
+}
+
 useHead({
-  title: 'Home Page',
+  title: 'Player List',
   meta: [
-    { name: 'description', content: 'This is the home page of the app.' },
-    { property: 'og:title', content: 'Home Title' }
+    { name: 'description', content: 'List of players from API.' },
+    { property: 'og:title', content: 'Player List Page' }
   ]
 })
 </script>
@@ -82,33 +70,22 @@ useHead({
 <script>
 import axios from 'axios'
 
-
 export default {
   async load() {
-    const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-    }
-
-    const [postsRes, usersRes, imagesRes] = await Promise.all([
-      axios.get("https://jsonplaceholder.typicode.com/posts?_limit=5", { headers }),
-      axios.get("https://jsonplaceholder.typicode.com/users?_limit=3", { headers }),
-      axios.get("https://randomuser.me/api/?results=3", { headers })
-    ])
-
-    const users = usersRes.data.map((user, i) => ({
-      ...user,
-      image: imagesRes.data.results[i]?.picture?.medium || 'https://via.placeholder.com/100'
-    }))
-
-    return {
-      posts: postsRes.data,
-      users
+    try {
+      const res = await axios.get('http://assistant-caochs.test/api/player-list', {
+        headers: {
+          Authorization: 'Bearer 1|RnRN5pzxzeGiGSDCk6s36QCxo98gadELLqEoHbDa07cee14e'
+        }
+      })
+      return { players: res.data.data }
+    } catch (e) {
+      console.error('SSR Load Error', e)
+      return { players: [] }
     }
   }
 }
-
 </script>
-
 
 <style scoped>
 .page-container {
