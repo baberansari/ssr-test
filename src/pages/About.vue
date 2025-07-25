@@ -33,9 +33,9 @@ if (ssrData.sports) {
   loading.value = true
   onMounted(async () => {
     try {
-      const res = await axios.get('http://assistant-caochs.test/api/sport', {
+      const res = await axios.get('https://staging.humandashboard.ca/api/sport', {
         headers: {
-          Authorization: 'Bearer 1|RnRN5pzxzeGiGSDCk6s36QCxo98gadELLqEoHbDa07cee14e'
+          Authorization: 'Bearer 117|GST61T4wC8ulmh8SKEyX1CBhoCs8dfpWDhQ9ecnz482f4f60'
         }
       })
       sports.value = res.data.data || []
@@ -64,9 +64,9 @@ import axios from 'axios'
 export default {
   async load() {
     try {
-      const res = await axios.get('http://assistant-caochs.test/api/sport', {
+      const res = await axios.get('https://staging.humandashboard.ca/api/sport', {
         headers: {
-          Authorization: 'Bearer 1|RnRN5pzxzeGiGSDCk6s36QCxo98gadELLqEoHbDa07cee14e'
+          Authorization: 'Bearer 117|GST61T4wC8ulmh8SKEyX1CBhoCs8dfpWDhQ9ecnz482f4f60'
         }
       })
       return { sports: res.data.data || [] }

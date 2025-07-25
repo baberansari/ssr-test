@@ -40,9 +40,9 @@ if (ssrData.players) {
   loading.value = true
   onMounted(async () => {
     try {
-      const response = await axios.get('http://assistant-caochs.test/api/player-list', {
+      const response = await axios.get('https://staging.humandashboard.ca/api/player-list', {
         headers: {
-          Authorization: 'Bearer 1|RnRN5pzxzeGiGSDCk6s36QCxo98gadELLqEoHbDa07cee14e'
+          Authorization: 'Bearer 117|GST61T4wC8ulmh8SKEyX1CBhoCs8dfpWDhQ9ecnz482f4f60'
         }
       })
       players.value = response.data.data
@@ -55,7 +55,7 @@ if (ssrData.players) {
 }
 
 const playerImageUrl = (path) => {
-  return path ? `http://assistant-caochs.test/${path}` : ''
+  return path ? `https://staging.humandashboard.ca/${path}` : ''
 }
 
 useHead({
@@ -73,9 +73,9 @@ import axios from 'axios'
 export default {
   async load() {
     try {
-      const res = await axios.get('http://assistant-caochs.test/api/player-list', {
+      const res = await axios.get('https://staging.humandashboard.ca/api/player-list', {
         headers: {
-          Authorization: 'Bearer 1|RnRN5pzxzeGiGSDCk6s36QCxo98gadELLqEoHbDa07cee14e'
+          Authorization: 'Bearer 117|GST61T4wC8ulmh8SKEyX1CBhoCs8dfpWDhQ9ecnz482f4f60'
         }
       })
       return { players: res.data.data }
